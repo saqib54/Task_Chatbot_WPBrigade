@@ -1,9 +1,14 @@
 from flask import Flask, request, jsonify, render_template, session, redirect, url_for
+from whitenoise import WhiteNoise
 import sqlite3
 import re
+import os
 
 app = Flask(__name__, template_folder="Templates", static_folder="static")
-app.secret_key = "task_chatbot_vibe_secret_key"
+app.secret_key = os.environ.get("SECRET_KEY", "task_chatbot_vibe_secret_key")
+
+# Serve static files in production (Render / gunicorn)
+app.wsgi_app = WhiteNoise(app.wsgi_app, root="static", prefix="static")
 
 
 # Database Connection Helper
