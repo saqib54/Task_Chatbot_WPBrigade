@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login — User Management Bot</title>
+    <meta name="description" content="Secure login to the Intelligent User Management Chatbot system.">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div class="login-page">
+    <div class="login-card">
+
+        <!-- Theme toggle -->
+        <div class="login-theme-row">
+            <button class="theme-toggle" id="themeToggle" title="Toggle light/dark mode" aria-label="Toggle theme">
+                <!-- Moon icon (dark mode) -->
+                <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/>
+                </svg>
+                <!-- Sun icon (light mode) -->
+                <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="5"/>
+                    <line x1="12" y1="1" x2="12" y2="3"/>
+                    <line x1="12" y1="21" x2="12" y2="23"/>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                    <line x1="1" y1="12" x2="3" y2="12"/>
+                    <line x1="21" y1="12" x2="23" y2="12"/>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Logo -->
+        <div class="login-logo">
+            <svg viewBox="0 0 24 24">
+                <path d="M12 2C6.477 2 2 6.477 2 12c0 1.821.487 3.53 1.338 5.003L2 22l5.127-1.258A9.957 9.957 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm0 18a7.962 7.962 0 01-4.283-1.235l-.307-.184-2.88.707.729-2.812-.2-.317A7.965 7.965 0 014 12c0-4.411 3.589-8 8-8s8 3.589 8 8-3.589 8-8 8z"/>
+                <circle cx="8.5" cy="12" r="1.2"/>
+                <circle cx="12" cy="12" r="1.2"/>
+                <circle cx="15.5" cy="12" r="1.2"/>
+            </svg>
+        </div>
+
+        <h1 class="login-title">Welcome Back</h1>
+        <p class="login-subtitle">Enter your registered email address to access the User Management System.</p>
+
+        {% if error %}
+        <div class="error-banner" id="errorBanner">
+            <span>⚠️</span>
+            <div>{{ error }}</div>
+        </div>
+        {% endif %}
+
+        <form method="POST" id="loginForm">
+            <div class="form-group">
+                <label for="emailInput">Email Address</label>
+                <input
+                    type="email"
+                    id="emailInput"
+                    name="email"
+                    class="input-control"
+                    placeholder="e.g. jhon.smith@xyz.com"
+                    required
+                    autocomplete="email">
+            </div>
+
+            <button type="submit" class="btn-primary" id="submitBtn">
+                <span>Access System</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+            </button>
+        </form>
+
+        <div class="demo-hints">
+            <div class="demo-hints-title">✨ Click a demo account to auto-login:</div>
+            <div class="chips-group">
+                <span class="chip" onclick="fillAndSubmit('jhon.smith@xyz.com')">jhon.smith@xyz.com</span>
+                <span class="chip" onclick="fillAndSubmit('samantha@xyz.com')">samantha@xyz.com</span>
+                <span class="chip" onclick="fillAndSubmit('alex.j@xyz.com')">alex.j@xyz.com</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Theme persistence
+    const savedTheme = localStorage.getItem('chatbot-theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+
+    document.getElementById('themeToggle').addEventListener('click', () => {
+        const current = document.documentElement.getAttribute('data-theme');
+        const next = current === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('chatbot-theme', next);
+    });
+
+    function fillAndSubmit(email) {
+        document.getElementById('emailInput').value = email;
+        document.getElementById('loginForm').submit();
+    }
+</script>
+
+</body>
+</html>

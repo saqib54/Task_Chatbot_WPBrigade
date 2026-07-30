@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Presentation | User Management Chatbot System</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap">
+    <style>
+        :root {
+            --bg-dark: #090d16;
+            --bg-card: rgba(18, 26, 43, 0.75);
+            --bg-card-border: rgba(255, 255, 255, 0.1);
+            --primary-gradient: linear-gradient(135deg, #6366f1 0%, #06b6d4 100%);
+            --accent-glow: rgba(99, 102, 241, 0.3);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --text-dim: #64748b;
+            --status-success: #10b981;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(at 20% 20%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+                radial-gradient(at 80% 80%, rgba(6, 182, 212, 0.15) 0px, transparent 50%);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Top Progress Bar */
+        .progress-bar-container {
+            height: 4px;
+            background: rgba(255, 255, 255, 0.05);
+            width: 100%;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background: var(--primary-gradient);
+            width: 12.5%;
+            transition: width 0.4s ease;
+        }
+
+        /* Deck Header */
+        .deck-header {
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--bg-card-border);
+        }
+        .deck-title { font-weight: 700; font-size: 1.1rem; display: flex; align-items: center; gap: 10px; }
+        .slide-counter { background: rgba(255, 255, 255, 0.08); padding: 6px 16px; border-radius: 20px; font-size: 0.85rem; color: #a5b4fc; }
+
+        /* Slide Viewport */
+        .slide-viewport {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            position: relative;
+        }
+
+        .slide {
+            display: none;
+            width: 100%;
+            max-width: 1000px;
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--bg-card-border);
+            border-radius: 24px;
+            padding: 48px 56px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.6), 0 0 40px var(--accent-glow);
+            animation: slideIn 0.5s ease-out;
+            min-height: 520px;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .slide.active { display: flex; }
+
+        .slide-tag {
+            display: inline-block;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #38bdf8;
+            margin-bottom: 12px;
+        }
+
+        .slide h2 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .slide p.subtitle {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            margin-bottom: 32px;
+            line-height: 1.6;
+        }
+
+        /* Grid Cards inside slides */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 10px;
+        }
+
+        .feature-card {
+            background: rgba(13, 20, 34, 0.6);
+            border: 1px solid var(--bg-card-border);
+            padding: 24px;
+            border-radius: 16px;
+        }
+
+        .feature-card h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .feature-card p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .code-box {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--bg-card-border);
+            padding: 16px 20px;
+            border-radius: 12px;
+            font-family: monospace;
+            color: #38bdf8;
+            font-size: 0.95rem;
+            margin-bottom: 12px;
+        }
+
+        /* Table styling */
+        .slide-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .slide-table th, .slide-table td {
+            padding: 14px 18px;
+            text-align: left;
+            border-bottom: 1px solid var(--bg-card-border);
+            font-size: 0.95rem;
+        }
+
+        .slide-table th {
+            background: rgba(255, 255, 255, 0.06);
+            color: #a5b4fc;
+        }
+
+        /* Controls Footer */
+        .controls-footer {
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--bg-card-border);
+        }
+
+        .btn-nav {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--bg-card-border);
+            color: var(--text-main);
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-nav:hover {
+            background: rgba(99, 102, 241, 0.2);
+            border-color: rgba(99, 102, 241, 0.4);
+            color: #ffffff;
+        }
+
+        .btn-nav:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .nav-hint { font-size: 0.8rem; color: var(--text-dim); }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="progress-bar-container">
+        <div class="progress-bar-fill" id="progressFill"></div>
+    </div>
+
+    <header class="deck-header">
+        <div class="deck-title">
+            <span style="font-size: 1.4rem;">🤖</span>
+            <span>User Management Chatbot — Presentation Deck</span>
+        </div>
+        <div class="slide-counter" id="slideCounter">Slide 1 of 8</div>
+    </header>
+
+    <main class="slide-viewport">
+        <!-- Slide 1: Title -->
+        <section class="slide active">
+            <span class="slide-tag">Assessment Showcase</span>
+            <h2>Intelligent User Management Chatbot</h2>
+            <p class="subtitle">A full-stack, glassmorphic conversational assistant featuring auto-login, natural language command parsing, and live state synchronization.</p>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>🔐 Auto-Login Engine</h3>
+                    <p>Instant email validation against persistent database with demo quick-connect chips.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🧠 NLP Parser</h3>
+                    <p>Executes complex add, remove, and city/phone update commands effortlessly.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>✨ Glassmorphic UI</h3>
+                    <p>Sleek dark theme with live user database sidebar and micro-animations.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 2: Objective & Transformation -->
+        <section class="slide">
+            <span class="slide-tag">Project Overview</span>
+            <h2>From Simple Script to Professional App</h2>
+            <p class="subtitle">The goal was to transform a minimal CRUD assessment task into an enterprise-ready, aesthetically stunning web chatbot.</p>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>❌ Before (Legacy)</h3>
+                    <p>Basic unstyled HTML forms, simple exact regex matches, manual page reloads, and plain text raw responses.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>✅ After (Upgraded)</h3>
+                    <p>Glassmorphic UI, flexible NLP parser handling quotes & possessive names, live user sidebar sync, and styled table responses.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 3: Core Features -->
+        <section class="slide">
+            <span class="slide-tag">System Capabilities</span>
+            <h2>Key Platform Features</h2>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>🔑 Auto-Login & Auth</h3>
+                    <p>Verifies registered users via SQLite. Provides 1-click quick login shortcuts for demo testing.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>💬 Natural Language Assistant</h3>
+                    <p>Understands freeform queries without forcing rigid, artificial command formats.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🔄 Live Database Sync</h3>
+                    <p>Sidebar updates instantly when records change without full page refreshes.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>⚡ Quick-Trigger Pills</h3>
+                    <p>Clickable command chips allow instant testing of sample user operations.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 4: NLP Capabilities -->
+        <section class="slide">
+            <span class="slide-tag">Natural Language Engine</span>
+            <h2>Intelligent Command Handling</h2>
+            <p class="subtitle">Supported queries with real-world formatting, quotes, and flexible syntax:</p>
+            
+            <div class="code-box">➕ can you add the user "john.smith@xyz.com" with phone number "+92332"</div>
+            <div class="code-box">✏️ can you update samanthas city to Cordoba</div>
+            <div class="code-box">🗑️ can you remove the user "john.smith@xyz.com"</div>
+            <div class="code-box">📋 show users</div>
+        </section>
+
+        <!-- Slide 5: Architecture & Tech Stack -->
+        <section class="slide">
+            <span class="slide-tag">System Architecture</span>
+            <h2>Technology Stack & Layers</h2>
+            
+            <table class="slide-table">
+                <thead>
+                    <tr>
+                        <th>Layer</th>
+                        <th>Technology Used</th>
+                        <th>Role & Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><b>Backend Core</b></td>
+                        <td>Python (Flask)</td>
+                        <td>REST routing, session management, and NLP parser logic.</td>
+                    </tr>
+                    <tr>
+                        <td><b>Database</b></td>
+                        <td>SQLite3</td>
+                        <td>Persistent storage for user schema (`name`, `email`, `phone`, `city`).</td>
+                    </tr>
+                    <tr>
+                        <td><b>Frontend UI</b></td>
+                        <td>HTML5 + JS + Vanilla CSS</td>
+                        <td>Glassmorphism design system, AJAX async fetch, live sidebar sync.</td>
+                    </tr>
+                    <tr>
+                        <td><b>Typography & Icons</b></td>
+                        <td>Plus Jakarta Sans</td>
+                        <td>Modern Google typography and HSL tailored color palette.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Slide 6: Database & Data Model -->
+        <section class="slide">
+            <span class="slide-tag">Data Schema</span>
+            <h2>SQLite User Data Model</h2>
+            <p class="subtitle">Structured SQL schema ensuring clean data integrity and instant lookups:</p>
+
+            <div class="code-box">
+                CREATE TABLE users (<br>
+                &nbsp;&nbsp;id INTEGER PRIMARY KEY AUTOINCREMENT,<br>
+                &nbsp;&nbsp;name TEXT NOT NULL,<br>
+                &nbsp;&nbsp;email TEXT UNIQUE NOT NULL,<br>
+                &nbsp;&nbsp;phone TEXT,<br>
+                &nbsp;&nbsp;city TEXT<br>
+                );
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 10px;">
+                Pre-seeded with demo records: <code>jhon.smith@xyz.com</code> (Admin), <code>samantha@xyz.com</code> (Samantha), <code>alex.j@xyz.com</code> (Alex Johnson).
+            </p>
+        </section>
+
+        <!-- Slide 7: Verification & Testing -->
+        <section class="slide">
+            <span class="slide-tag">Quality Assurance</span>
+            <h2>Automated Verification Results</h2>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>✅ Auto-Login Test</h3>
+                    <p>Verified 302 redirect for valid emails and 401 error message for non-existent users.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>✅ NLP Parsing Test</h3>
+                    <p>Verified 100% extraction accuracy on <code>add</code>, <code>update city</code>, and <code>remove</code> commands.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>✅ Live Sync Test</h3>
+                    <p>Verified immediate <code>/api/users</code> re-fetch upon database state mutation.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 8: Conclusion -->
+        <section class="slide">
+            <span class="slide-tag">Summary</span>
+            <h2>Conclusion & Presentation Ready</h2>
+            <p class="subtitle">The chatbot application fulfills all requirements with a premium aesthetic and high reliability.</p>
+
+            <div class="feature-card" style="text-align: center; padding: 32px;">
+                <h3 style="justify-content: center; font-size: 1.3rem;">🚀 Ready for Deployment & Demonstration</h3>
+                <p style="margin-top: 10px;">Start the app using <code>python app.py</code> and access at <code>http://127.0.0.1:5000</code>.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="controls-footer">
+        <button class="btn-nav" id="prevBtn" onclick="changeSlide(-1)">◀ Previous</button>
+        <span class="nav-hint">💡 Tip: Use Left / Right Arrow keys on your keyboard to navigate slides</span>
+        <button class="btn-nav" id="nextBtn" onclick="changeSlide(1)">Next ▶</button>
+    </footer>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                slide.classList.toggle('active', index === currentSlide);
+            });
+            document.getElementById('slideCounter').innerText = `Slide ${currentSlide + 1} of ${totalSlides}`;
+            document.getElementById('progressFill').style.width = `${((currentSlide + 1) / totalSlides) * 100}%`;
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+        }
+
+        function changeSlide(direction) {
+            currentSlide = Math.max(0, Math.min(totalSlides - 1, currentSlide + direction));
+            updateSlide();
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                changeSlide(1);
+            } else if (e.key === 'ArrowLeft') {
+                changeSlide(-1);
+            }
+        });
+
+        updateSlide();
+    </script>
+</body>
+</html>

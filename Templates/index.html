@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard — User Management Bot</title>
+    <meta name="description" content="Interactive AI-powered user management chatbot dashboard.">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div class="app-wrapper">
+
+    <!-- ===== HEADER ===== -->
+    <header class="app-header">
+        <div class="header-left">
+            <div class="header-logo-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2C6.477 2 2 6.477 2 12c0 1.821.487 3.53 1.338 5.003L2 22l5.127-1.258A9.957 9.957 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2z"/>
+                </svg>
+            </div>
+            <div class="header-title-block">
+                <h1>User Management Bot</h1>
+                <div class="status-pill">
+                    <span class="pulse-dot"></span>
+                    <span>System Active</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="header-right">
+            <!-- Theme toggle -->
+            <button class="theme-toggle" id="themeToggle" title="Toggle theme" aria-label="Toggle theme">
+                <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/>
+                </svg>
+                <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="5"/>
+                    <line x1="12" y1="1" x2="12" y2="3"/>
+                    <line x1="12" y1="21" x2="12" y2="23"/>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                    <line x1="1" y1="12" x2="3" y2="12"/>
+                    <line x1="21" y1="12" x2="23" y2="12"/>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                </svg>
+            </button>
+
+            <!-- User Info -->
+            <div class="user-pill">
+                <div class="user-avatar-circle" id="userInitial">U</div>
+                <div>
+                    <div class="user-pill-name">{{ user_name }}</div>
+                    <div class="user-pill-email">{{ current_user }}</div>
+                </div>
+            </div>
+
+            <a href="/logout" class="btn-logout">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                    <polyline points="16 17 21 12 16 7"/>
+                    <line x1="21" y1="12" x2="9" y2="12"/>
+                </svg>
+                Logout
+            </a>
+        </div>
+    </header>
+
+    <!-- ===== MAIN GRID ===== -->
+    <div class="dashboard-grid">
+
+        <!-- ===== SIDEBAR ===== -->
+        <aside class="sidebar-panel">
+
+            <!-- Users DB Card -->
+            <div class="panel-card users-card">
+                <div class="panel-header">
+                    <div class="panel-title">
+                        <span class="panel-title-icon">👥</span>
+                        System Users
+                    </div>
+                    <span class="count-badge" id="userCountBadge">0 Users</span>
+                </div>
+                <div class="users-list-scroll" id="usersListScroll">
+                    <div class="empty-state">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="12" y1="8" x2="12" y2="12"/>
+                            <line x1="12" y1="16" x2="12.01" y2="16"/>
+                        </svg>
+                        <span>Loading database…</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Commands Card -->
+            <div class="panel-card">
+                <div class="panel-header">
+                    <div class="panel-title">
+                        <span class="panel-title-icon">⚡</span>
+                        Quick Commands
+                    </div>
+                </div>
+                <div class="preset-commands-list">
+                    <div class="command-pill" onclick="sendPresetCommand('can you add the user &quot;john.smith@xyz.com&quot; with phone number &quot;+92332&quot;')">
+                        <span class="cmd-icon">➕</span>
+                        <span>Add <code>john.smith@xyz.com</code> phone <code>+92332</code></span>
+                    </div>
+                    <div class="command-pill" onclick="sendPresetCommand('can you update samanthas city to Cordoba')">
+                        <span class="cmd-icon">✏️</span>
+                        <span>Update <code>samanthas</code> city to <code>Cordoba</code></span>
+                    </div>
+                    <div class="command-pill" onclick="sendPresetCommand('can you remove the user &quot;john.smith@xyz.com&quot;')">
+                        <span class="cmd-icon">🗑️</span>
+                        <span>Remove user <code>john.smith@xyz.com</code></span>
+                    </div>
+                    <div class="command-pill" onclick="sendPresetCommand('show users')">
+                        <span class="cmd-icon">📋</span>
+                        <span>Show all users</span>
+                    </div>
+                </div>
+            </div>
+
+        </aside>
+
+        <!-- ===== CHAT MAIN ===== -->
+        <main class="chat-container">
+
+            <!-- Chat Header -->
+            <div class="chat-header">
+                <div class="chat-header-left">
+                    <div class="bot-avatar-wrap">🤖</div>
+                    <div>
+                        <div class="chat-header-title">AI System Assistant</div>
+                        <div class="chat-header-sub">Natural language user management</div>
+                    </div>
+                </div>
+                <button class="btn-clear-chat" onclick="clearChatHistory()" id="clearChatBtn">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6"/>
+                        <path d="M19 6l-1 14H6L5 6"/>
+                        <path d="M10 11v6M14 11v6"/>
+                        <path d="M9 6V4h6v2"/>
+                    </svg>
+                    Clear Chat
+                </button>
+            </div>
+
+            <!-- Messages -->
+            <div class="chat-messages" id="chatMessages">
+                <div class="message-row bot">
+                    <div class="msg-avatar bot">🤖</div>
+                    <div class="msg-body">
+                        <div class="msg-bubble">
+                            👋 Welcome, <b>{{ user_name }}</b>! I'm your User Management Assistant.<br><br>
+                            You can use natural language to manage users. Try commands like:<br>
+                            • <i>can you add the user "john.smith@xyz.com" with phone "+92332"</i><br>
+                            • <i>can you update samanthas city to Cordoba</i><br>
+                            • <i>can you remove the user "john.smith@xyz.com"</i><br>
+                            • <i>show users</i>
+                        </div>
+                        <div class="msg-time" id="welcomeTime"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input -->
+            <div class="chat-input-area">
+                <div class="input-row">
+                    <input
+                        type="text"
+                        id="msgInput"
+                        class="chat-input"
+                        placeholder="Type a command… e.g. update samanthas city to Madrid"
+                        onkeydown="handleKeyPress(event)"
+                        autocomplete="off">
+                    <button class="btn-send" id="sendBtn" onclick="sendMessage()" aria-label="Send message">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="22" y1="2" x2="11" y2="13"/>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<script>
+    // ===== THEME =====
+    (function() {
+        const saved = localStorage.getItem('chatbot-theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', saved);
+    })();
+
+    document.getElementById('themeToggle').addEventListener('click', () => {
+        const cur  = document.documentElement.getAttribute('data-theme');
+        const next = cur === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('chatbot-theme', next);
+    });
+
+    // ===== INIT =====
+    document.getElementById('welcomeTime').innerText =
+        new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    // Set user initial in avatar
+    const userName = "{{ user_name }}";
+    const initEl = document.getElementById('userInitial');
+    if (userName && initEl) {
+        initEl.textContent = userName.trim().charAt(0).toUpperCase();
+    }
+
+    // ===== LOAD USERS =====
+    async function loadLiveUsers() {
+        try {
+            const res = await fetch('/api/users');
+            if (res.ok) {
+                const data = await res.json();
+                renderUsersSidebar(data.users || []);
+            }
+        } catch (e) {
+            console.error('Failed to load users', e);
+        }
+    }
+
+    function renderUsersSidebar(users) {
+        const container = document.getElementById('usersListScroll');
+        const badge     = document.getElementById('userCountBadge');
+        badge.innerText = `${users.length} User${users.length !== 1 ? 's' : ''}`;
+
+        if (users.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="32" height="32">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="8" y1="12" x2="16" y2="12"/>
+                    </svg>
+                    <span>No users in database</span>
+                </div>`;
+            return;
+        }
+
+        container.innerHTML = users.map(u => `
+            <div class="user-item-card">
+                <div class="user-item-name">${escapeHtml(u.name)}</div>
+                <div class="user-item-email">${escapeHtml(u.email)}</div>
+                <div class="user-item-meta">
+                    <span>📞 ${escapeHtml(u.phone || 'N/A')}</span>
+                    <span>📍 ${escapeHtml(u.city || 'N/A')}</span>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // ===== MESSAGING =====
+    function sendPresetCommand(cmdText) {
+        document.getElementById('msgInput').value = cmdText;
+        sendMessage();
+    }
+
+    function handleKeyPress(e) {
+        if (e.key === 'Enter') sendMessage();
+    }
+
+    async function sendMessage() {
+        const input = document.getElementById('msgInput');
+        const text  = input.value.trim();
+        if (!text) return;
+
+        input.value = '';
+        appendUserMessage(text);
+
+        const typingId = appendTypingIndicator();
+
+        try {
+            const res = await fetch('/message', {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body:    JSON.stringify({ message: text })
+            });
+
+            removeTypingIndicator(typingId);
+
+            if (res.ok) {
+                const data = await res.json();
+                appendBotMessage(data);
+                if (data.action || text.toLowerCase().includes('show')) {
+                    loadLiveUsers();
+                }
+            } else {
+                appendBotMessage({ reply: "⚠️ Server error while processing your request.", status: "error" });
+            }
+        } catch (err) {
+            removeTypingIndicator(typingId);
+            appendBotMessage({ reply: "⚠️ Connection error. Please check the backend server.", status: "error" });
+        }
+    }
+
+    function appendUserMessage(text) {
+        const container = document.getElementById('chatMessages');
+        const timeStr   = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const row       = document.createElement('div');
+        row.className   = 'message-row user';
+        row.innerHTML   = `
+            <div class="msg-avatar user">👤</div>
+            <div class="msg-body">
+                <div class="msg-bubble">${escapeHtml(text)}</div>
+                <div class="msg-time">${timeStr}</div>
+            </div>`;
+        container.appendChild(row);
+        scrollToBottom();
+    }
+
+    function appendBotMessage(data) {
+        const container = document.getElementById('chatMessages');
+        const timeStr   = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const row       = document.createElement('div');
+        row.className   = 'message-row bot';
+        row.innerHTML   = `
+            <div class="msg-avatar bot">🤖</div>
+            <div class="msg-body">
+                <div class="msg-bubble">${formatBotResponse(data)}</div>
+                <div class="msg-time">${timeStr}</div>
+            </div>`;
+        container.appendChild(row);
+        scrollToBottom();
+    }
+
+    function formatBotResponse(data) {
+        const text = data.reply || '';
+        if (data.users && Array.isArray(data.users)) {
+            let table = `<div style="margin-bottom:10px">${formatMarkdown(text)}</div>
+                <table class="response-table">
+                    <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>City</th></tr></thead>
+                    <tbody>`;
+            data.users.forEach(u => {
+                table += `<tr>
+                    <td><b>${escapeHtml(u.name)}</b></td>
+                    <td><code>${escapeHtml(u.email)}</code></td>
+                    <td>${escapeHtml(u.phone || '—')}</td>
+                    <td>${escapeHtml(u.city || '—')}</td>
+                </tr>`;
+            });
+            table += `</tbody></table>`;
+            return table;
+        }
+        return formatMarkdown(text);
+    }
+
+    function formatMarkdown(str) {
+        return str
+            .replace(/`([^`]+)`/g, '<code>$1</code>')
+            .replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>')
+            .replace(/\n/g, '<br>');
+    }
+
+    function appendTypingIndicator() {
+        const container = document.getElementById('chatMessages');
+        const id = 'typing_' + Date.now();
+        const row = document.createElement('div');
+        row.className = 'message-row bot';
+        row.id = id;
+        row.innerHTML = `
+            <div class="msg-avatar bot">🤖</div>
+            <div class="msg-body">
+                <div class="msg-bubble">
+                    <div class="typing-indicator">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                </div>
+            </div>`;
+        container.appendChild(row);
+        scrollToBottom();
+        return id;
+    }
+
+    function removeTypingIndicator(id) {
+        const el = document.getElementById(id);
+        if (el) el.remove();
+    }
+
+    function clearChatHistory() {
+        const container = document.getElementById('chatMessages');
+        container.innerHTML = `
+            <div class="message-row bot">
+                <div class="msg-avatar bot">🤖</div>
+                <div class="msg-body">
+                    <div class="msg-bubble">✨ Chat cleared. How can I assist you?</div>
+                    <div class="msg-time">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                </div>
+            </div>`;
+    }
+
+    function scrollToBottom() {
+        const el = document.getElementById('chatMessages');
+        el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
+    }
+
+    function escapeHtml(t) {
+        if (!t) return '';
+        return String(t)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    // ===== BOOT =====
+    loadLiveUsers();
+</script>
+
+</body>
+</html>

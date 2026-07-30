@@ -1,0 +1,27 @@
+
+------------------------------
+Chatbot Assignment Task
+------------------------------
+
+## Features
+
+Auto login
+add / remove /update/ search user
+
+## requirenets
+
+python + flask
+
+## install
+
+flask lib
+python
+
+## run
+
+python app.py
+run on localhost
+
+## login 
+
+jhon.smith@xyz.com
